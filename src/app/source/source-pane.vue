@@ -4,6 +4,7 @@
             tbody
                 tr(
                     v-for="(source) in sources"
+                    v-if="!demo || source.demo"
                 )
                     td
                         input(
@@ -18,58 +19,60 @@
     loading(v-else)
 </template>
 
-<script>
-    import { mapState, mapMutations } from 'vuex';
+<script lang="ts">
+    import { Component, Vue, Watch } from "vue-property-decorator";
+    import { Mutation, State } from "vuex-class";
+
+    import MutationFunction from "../MutationFunction";
+
+    import Source from "./Source";
+    import SourceGroup from "./SourceGroup";
+
+    import { SET_SOURCES } from "../../scripts/mutation-types";
 
     import loading from "../loading";
 
-    import { UPDATE_SOURCE } from '../../scripts/mutation-types';
-
-    export default {
+    @Component({
         components: {
             loading,
         },
+    })
+    export default class extends Vue {
+        @State((state) => state.sourceModule.sourceGroup) private sourceGroup!: SourceGroup;
+        private sources: Source[] = [];
+        private demo = process.env.DEMO || false;
+        private unwatchFunctions: Array<() => void> = [];
+        @Mutation(SET_SOURCES) private SET_SOURCES!: MutationFunction;
 
-        data() {
-            return {
-                sources: []
-            }
-        },
+        private loadSources() {
+            this.sources = this.sourceGroup.get();
 
-        computed: {
-            ...mapState({
-                sourceGroup: state => state.sourceModule.sourceGroup
-            })
-        },
+            this.sources.forEach((source, i) => {
+                this.unwatchFunctions.push(this.$watch(() => this.sources[i].active, (active) => {
+                    this[SET_SOURCES]({ i, active });
+                }));
+            });
+        }
 
-        methods: {
-            loadSources() {
-                this.sources = this.sourceGroup.get();
+        private unwatch() {
+            this.unwatchFunctions.forEach((u) => u());
+            this.unwatchFunctions = [];
+        }
 
-                this.sources.forEach((source, index) => {
-                    this.$watch(() => {
-                        return this.sources[index].active;
-                    }, to => {
-                        this[UPDATE_SOURCE]({ index, active: to });
-                    });
-                });
-            },
-
-            ...mapMutations([
-                UPDATE_SOURCE
-            ])
-        },
-
-        created() {
+        private created() {
             if (this.sourceGroup.length) {
                 this.loadSources();
             }
-        },
+        }
 
-        watch: {
-            'sourceGroup.length' () {
-                this.loadSources();
-            }
+        private destroyed() {
+            this.unwatch();
+        }
+
+        @Watch("sourceGroup.length")
+        private async onSourceGroupLengthChanged() {
+            this.unwatch();
+            this.loadSources();
         }
     }
 </script>

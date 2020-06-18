@@ -7,6 +7,7 @@
         )
             .icon(
                 v-for="(source) in sources"
+                v-if="!demo || source.demo"
                 :style="{ width: iconWidth, paddingLeft: iconPadding, paddingRight: iconPadding }"
             )
                 img(
@@ -41,11 +42,12 @@
     @Component
     export default class extends Vue {
         public $refs!: { icons: HTMLElement };
-        private showIcons = false;
         @State((state) => state.generalModule.mode) private mode!: string;
         @State((state) => state.generalModule.preference || config.defaultPreference) private preference!: any;
         @State((state) => state.generalModule.showSourceIcon) private showSourceIcon!: boolean;
         @State((state) => state.sourceModule.sourceGroup) private sourceGroup!: SourceGroup;
+        private showIcons = false;
+        private demo = process.env.DEMO || false;
 
         private get sources() {
             return this.sourceGroup.get(undefined);

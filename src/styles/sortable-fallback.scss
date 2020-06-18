@@ -2,7 +2,6 @@
   display: table;
   position: absolute;
   color: #fff;
-  opacity: .5 !important;
   cursor: default;
 
   td {
@@ -21,6 +20,11 @@
       margin-top: 1px;
       fill: #fff;
       transform: translateY(4px);
+    }
+
+    img {
+      width: 15px;
+      height: 15px;
     }
   }
 }

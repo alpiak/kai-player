@@ -219,7 +219,10 @@
                             style="width:46px"
                         ) {{ track.duration | formatDuration('mm:ss') }}
                         td(v-else)
-                        td(v-if="showSourceIcon")
+                        td(
+                            v-if="showSourceIcon && !demo || track.source.demo"
+                            style="text-align: right"
+                        )
                             template(v-if="performanceFactor >= .2")
                                 img(
                                     :src="track.source.icons[0] || defaultIcon"
@@ -234,7 +237,7 @@
                                     height="20"
                                     viewBox="0 0 24 24"
                                 )
-                                    path(d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z")
+                                    use(xlink:href="#icon_menu")
 
                     tr(
                         slot="footer"
@@ -291,6 +294,7 @@
               RandomTrackQueue,
               Status,
               defaultIcon: config.defaultIcon,
+              demo: process.env.DEMO,
           };
         },
 
@@ -727,6 +731,10 @@
 
         tr {
             cursor: default;
+
+            &.sortable-ghost {
+                opacity: .2 !important;
+            }
 
             svg {
                 width: 18px;

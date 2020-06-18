@@ -38,7 +38,7 @@
         }
 
         private tips = [
-            "Panels are resizable and movable.",
+            "Drag-n-Drop fully supported.",
             "Select the \"Listen Randomly\" playlist to start playing random tracks pushed by the app.",
             "Pick up a visualization effect from the drop-down on the control bar (visualization may be inactive with slo" +
                 "w network).",

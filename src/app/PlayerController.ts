@@ -755,7 +755,21 @@ export default class PlayerController implements IPlayerController {
             this.player.play();
             this.loading = false;
 
-            if (/^\/proxy/.test(loadedUrl)) {
+            const parseUrl = (url: string) => {
+                try {
+                    return new URL(url);
+                } catch (e) {
+                    // console.log(e);
+
+                    return { host: undefined, hostname: undefined };
+                }
+            };
+
+            const sameOrigin = ({ host, hostname }: { host?: string, hostname?: string }) => {
+                return host === location.host && hostname === location.hostname;
+            };
+
+            if (/^\/proxy/.test(loadedUrl) || sameOrigin(parseUrl(loadedUrl)) || process.env.DEMO) {
                 // @ts-ignore
                 this.timeouts.push(setTimeout(() => this.visualizer.listen(this.player.sound._sounds[0]._node), 1000));
             }

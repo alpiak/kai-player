@@ -106,6 +106,7 @@
                 interactables: [],
                 unwatchFunctions: [],
                 active: false,
+                unwatch: () => {},
             }
         },
 
@@ -148,14 +149,6 @@
         },
 
         watch: {
-            opacity() {
-                this.saveLayout();
-            },
-
-            lock() {
-                this.saveLayout();
-            },
-
             performanceFactor() {
                 if (this.interactable && !this.interactableInit) {
                     this.initInteractable();
@@ -416,10 +409,10 @@
             ...mapMutations([
                 UPDATE_ACTIVE_PANEL_INDEX,
                 SET_ACTIVE_PANEL_INDEX_LOCK
-            ])
+            ]),
         },
 
-        mounted() {
+        async mounted() {
             this.attach = this.value.attach;
             this.opacity = this.value.opacity;
             this.lock = this.value.lock;
@@ -507,8 +500,49 @@
                 this[SET_ACTIVE_PANEL_INDEX_LOCK](true);
             });
 
+            let unwatch;
+            let opacityChanging = false;
+            let opacityUpdate = false;
+
+            unwatch = this.$watch("opacity", () => {
+                if (opacityChanging) {
+                    opacityUpdate = true;
+
+                    return;
+                }
+
+                opacityChanging = true;
+
+                setTimeout(() => {
+                    opacityChanging = false;
+
+                    if (opacityUpdate) {
+                        opacityUpdate = false;
+
+                        this.saveLayout();
+                    }
+                }, 1000);
+
+                this.saveLayout();
+            });
+
+            this.unwatch = () => {
+                this.unwatch();
+                unwatch();
+            };
+
+            unwatch = this.$watch("lock", () => {
+                this.saveLayout();
+            });
+
+            this.unwatch = () => {
+                this.unwatch();
+                unwatch();
+            };
         },
+
         destroyed() {
+            this.unwatch();
             this.destroyInteractable();
         }
     }

@@ -79,7 +79,7 @@
     "The connection to the server is slow.": "服务器连接慢。",
     "The connection to the server is unstable.": "服务器连接不稳定。",
     "Unknown error.": "未知错误.",
-    "Panels are resizable and movable.": "面板可以移动、调整大小。",
+    "Drag-n-Drop fully supported.": "支持各种拖放操作。",
     "Select the \"Listen Randomly\" playlist to start playing random tracks pushed by the app.": "选择\"随便听听\"播放列表随机播放APP推送的音乐。",
     "Pick up a visualization effect from the drop-down on the control bar (visualization may be inactive with slow network).": "使用控制面板上的下拉菜单选择可视化效果（弱网络环境下可视化可能不被激活）。",
     "Detailed preference settings available via the gear icon on the control bar.": "详细偏好设置请点击控制面板上的齿轮图标。",

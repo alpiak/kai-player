@@ -9,14 +9,16 @@ export default class Source extends Set<TrackList> {
 
     public readonly id: string;
     public readonly icons: string[];
+    public readonly demo: boolean;
     public active: boolean;
     public priority: number;
 
-    constructor(id: string, { name, icons }: { name?: string, icons?: string[] } = {}) {
+    constructor(id: string, { name, icons, demo = false }: { name?: string, icons?: string[], demo?: boolean } = {}) {
         super({ name });
 
         this.id = id;
         this.icons = icons || [];
+        this.demo = demo;
         this.active = false;
         this.priority = 1;
     }

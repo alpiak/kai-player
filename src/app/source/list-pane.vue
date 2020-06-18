@@ -84,6 +84,7 @@
     import TrackList from "./TrackList";
 
     import { PLAY_TRACK } from "../../scripts/action-types";
+
     import { ADD_TRACK, INSERT_QUEUE, UPDATE_ACTIVE_VISUALIZER_TYPE, UPDATE_PLAYING_QUEUE_INDEX, UPDATE_QUEUE,
         UPDATE_QUEUE_GROUP, VISUALIZER_LOAD_RESOURCE } from "../../scripts/mutation-types";
 
@@ -170,8 +171,9 @@
                     this[INSERT_QUEUE]({
                         index: this.queueGroup.length,
 
-                        queue: new TrackQueue({ name: `${this.trackListSelected && this.trackListSelected.name}` +
-                                `(${moment().format("YYYY-MM-DD")})` }),
+                        queue: new TrackQueue({ name: `
+                            ${this.trackListSelected && this.trackListSelected.name}(${moment().format("YYYY-MM-DD")})
+                        ` }),
                     });
 
                     this[UPDATE_QUEUE_GROUP]({activeIndex: this.queueGroup.length - 1});

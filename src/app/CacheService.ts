@@ -3,7 +3,7 @@ import * as LRUCache from "lru-cache";
 import ICacheService from "./ICacheService";
 
 export default class CacheService implements ICacheService {
-    private static CACHE_VERSION = "v1.0.4";
+    private static CACHE_VERSION = "v1.0.5";
     private static CACHE_QUOTA_RATIO = .8;
     private static LRU_CACHE_DATA_KEY = "lrucache";
     private static DB_NAME = "kaiplayer";

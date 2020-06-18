@@ -403,12 +403,12 @@ const sourceModule = {
         sources: (state) => state.sourceGroup.get(),
     },
     mutations: {
-        [mutationTypes.ADD_SOURCES] (state, sources) {
-            state.sourceGroup.add(sources);
-            playerController.sources = state.sourceGroup.get();
+        [mutationTypes.SET_SOURCES] (state, sources) {
+            state.sourceGroup.set(sources);
+            playerController.sources = sources;
         },
 
-        [mutationTypes.UPDATE_SOURCE] (state, { index, active }) {
+        [mutationTypes.REFRESH_SOURCE] (state, { index, active }) {
             if (typeof active !== "undefined") {
                 state.sourceGroup.get(index).active = active;
 
@@ -435,6 +435,64 @@ const sourceModule = {
     },
     actions: {
         async [actionTypes.FETCH_SOURCES] ({ state, dispatch, commit }) {
+            const loadLists = async (sources) => {
+                try {
+                    const listResSet = await fetchData("/audio/lists", { body: sources.map((source) => ({ source: source.id })) });
+
+                    if (listResSet) {
+                        listResSet.forEach((listRes, i) => {
+                            if (!listRes || listRes.code !== 1 || !listRes.data || !listRes.data.length) {
+                                return;
+                            }
+
+                            sources[i].clear();
+                            listRes.data.forEach((listData) => sources[i].add(new TrackList(listData.id, listData.name, sources[i], { sources })));
+                        });
+
+                        commit(mutationTypes.REFRESH_SOURCE, sources);
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
+            };
+
+            const createSourcesFromData = (data) => {
+                return data.map((sourceData, i) => {
+                    const source = new Source(sourceData.id, {
+                        name: sourceData.name,
+                        icons: sourceData.icons,
+                        demo: sourceData.demo,
+                    });
+
+                    const sourceActiveMap = JSON.parse(localStorage.getItem("kaiplayersourceactive")) || {};
+
+                    if (sourceActiveMap.hasOwnProperty(sourceData.id)) {
+                        source.active = sourceActiveMap[sourceData.id];
+                    } else {
+                        source.active = true;
+                    }
+
+                    source.priority = (() => {
+                        if (data.length === 1) {
+                            return 1;
+                        }
+
+                        return (1 - i / data.length);
+                    })();
+
+                    return source;
+                });
+            };
+
+            const sourcesDataJSON = localStorage.getItem("kaiplayersources");
+
+            if (sourcesDataJSON) {
+                const sources = createSourcesFromData(JSON.parse(sourcesDataJSON));
+                commit(mutationTypes.SET_SOURCES, sources);
+                dispatch(actionTypes.UPDATE_TRACK_SOURCE);
+                await loadLists(sources);
+            }
+
             try {
                 const sourcesRes = await fetchData("/audio/sources");
 
@@ -448,51 +506,14 @@ const sourceModule = {
 
                 const sourcesData = sourcesRes.data;
 
-                const sources = sourcesData.map((sourceData, i) => {
-                    const source = new Source(sourceData.id, {
-                        name: sourceData.name,
-                        icons: sourceData.icons,
-                    });
+                localStorage.setItem("kaiplayersources", JSON.stringify(sourcesData));
 
-                    const sourceActiveMap = JSON.parse(localStorage.getItem("kaiplayersourceactive")) || {};
+                const sources = createSourcesFromData(sourcesData);
 
-                    if (sourceActiveMap.hasOwnProperty(sourceData.id)) {
-                        source.active = sourceActiveMap[sourceData.id];
-                    } else {
-                        source.active = true;
-                    }
-
-                    source.priority = (() => {
-                        if (sourcesData.length === 1) {
-                            return 1;
-                        }
-
-                        return (1 - i / sourcesData.length);
-                    })();
-
-                    return source;
-                });
-
-                commit(mutationTypes.ADD_SOURCES, sources);
+                commit(mutationTypes.SET_SOURCES, sources);
                 dispatch(actionTypes.UPDATE_TRACK_SOURCE);
 
-                try {
-                    const listResSet = await fetchData("/audio/lists", { body: sources.map((source) => ({ source: source.id })) });
-
-                    if (listResSet) {
-                        listResSet.forEach((listRes, i) => {
-                            if (!listRes || listRes.code !== 1 || !listRes.data || !listRes.data.length) {
-                                return;
-                            }
-
-                            listRes.data.forEach((listData) => sources[i].add(new TrackList(listData.id, listData.name, sources[i], { sources })));
-                        });
-
-                        commit(mutationTypes.UPDATE_SOURCE, sources);
-                    }
-                } catch (e) {
-                    console.log(e);
-                }
+                await loadLists(sources);
 
                 return sources;
             } catch (e) {
@@ -579,7 +600,7 @@ const queueModule = {
     },
     mutations: {
         [mutationTypes.UPDATE_QUEUE_GROUP](state, { queues, activeIndex }) {
-            queues && state.queueGroup.load(queues);
+            queues && state.queueGroup.set(queues);
 
             if (typeof activeIndex === 'number') {
                 state.queueGroup.activeIndex = activeIndex;
@@ -597,7 +618,7 @@ const queueModule = {
             const queue = state.queueGroup.get(index);
 
             name && (queue.name = name);
-            tracks && queue.load(tracks);
+            tracks && queue.set(tracks);
 
             if (typeof activeIndex === "number" || activeIndex === null) {
                 queue.activeIndex = activeIndex;

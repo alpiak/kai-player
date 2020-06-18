@@ -580,7 +580,7 @@
             this[INIT_PLAYER_MODULE]();
 
             const initQueueModulePromise = this[INIT_QUEUE_MODULE]();
-            const fetchSourcesPromises = this[FETCH_SOURCES]();
+            const fetchSourcesPromise = this[FETCH_SOURCES]();
             const interactable = interact(document.body);
 
             if (this.visualizer) {
@@ -677,7 +677,11 @@
                 const track = await (async () => {
                     while (true) {
                         try {
-                            return await getRecommendedTrack(null, await fetchSourcesPromises);
+                            if (process.env.DEMO) {
+                                return await getRecommendedTrack(null, [(await fetchSourcesPromise)[0]]);
+                            }
+
+                            return await getRecommendedTrack(null, (await fetchSourcesPromise).slice(1));
                         } catch (e) {
                             console.log(e);
 
@@ -697,7 +701,7 @@
                     const track = await (async () => {
                         while (true) {
                             try {
-                                return await getRecommendedTrack(null, await fetchSourcesPromises);
+                                return await getRecommendedTrack(null, await fetchSourcesPromise);
                             } catch (e) {
                                 console.log(e);
 

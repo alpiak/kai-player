@@ -79,7 +79,7 @@
     "The connection to the server is slow.": "サーバーへの接続が遅い。",
     "The connection to the server is unstable.": "サーバーへの接続が不安定。",
     "Unknown error.": "未確認エラー。",
-    "Panels are resizable and movable.": "パネルはサイズ調整、移動可能。",
+    "Drag-n-Drop fully supported.": "Drag-n-Drop完全サポート。",
     "Select the \"Listen Randomly\" playlist to start playing random tracks pushed by the app.": "\"気軽に聴く\"というプレーリストを選択して、アプリによってプッシュされた音楽が連続再生できる。",
     "Pick up a visualization effect from the drop-down on the control bar (visualization may be inactive with slow network).": "コントロールバーのドロップダウンリストから視覚化効果を選択（不安定なネット接続では視覚化が非アクティブになる場合もあり）。",
     "Detailed preference settings available via the gear icon on the control bar.": "詳細設定ならコントロールバーの歯車アイコンをクリック。",

@@ -19,7 +19,11 @@ export default abstract class<T> implements ISet<T> {
         this.activeIndex = -1;
     }
 
-    public load(items: T|T[]) {
+    public clear() {
+        this.items = [];
+    }
+
+    public set(items: T|T[]) {
         if (items instanceof Array) {
             this.items = items;
         } else {
