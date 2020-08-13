@@ -7,4 +7,5 @@ export default interface IQueue<T> extends ISet<T> {
     previous(): number|null;
     next(): number|null;
     switchMode(): number;
+    indexOf(item: T): number|null;
 }

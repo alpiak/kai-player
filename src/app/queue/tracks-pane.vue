@@ -440,6 +440,8 @@
                         return !track1UniqueArtists.length && !track2UniqueArtists.length;
                     };
 
+                    const activeTrack = this.activeTrack();
+
                     this.tracks = this.tracks.filter((track, index) => {
                         return !this.tracks.find((anotherTrack, anotherIndex) => {
                             // Avoid comparing a track with itself or compare two same tracks multiple times
@@ -450,6 +452,8 @@
                             return checkSame(track, anotherTrack);
                         });
                     });
+
+                    this.activeIndex = this.queue.indexOf(activeTrack);
                 } catch (e) { }
             },
 

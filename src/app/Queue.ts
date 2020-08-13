@@ -67,6 +67,16 @@ export default class<T> extends Set<T> implements IQueue<T> {
         return this.modeIndex;
     }
 
+    public indexOf(item: T) {
+        for (let i = 0, len = this.items.length; i < len; i++ ) {
+            if (this.items[i] === item) {
+                return i;
+            }
+        }
+
+        return null;
+    }
+
     protected generateNextIndex(): number {
         if (this.activeIndex === null) {
             return -1;

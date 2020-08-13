@@ -9,10 +9,10 @@ import Vue from 'vue';
 import VTooltip from "v-tooltip";
 import VueConfirm from '../scripts/vue-confirm';
 
-import interact from 'interactjs';
-
 import { i18n } from "./i18n";
 import { requestNetworkIdle } from "../scripts/utils";
+
+import InteractDirective from "./directives/InteractDirective";
 
 import container from "./container";
 
@@ -82,48 +82,7 @@ if (!window["Promise"]) {
         }
     })();
 
-    const interactables = [];
-    const bindingValues = [];
-
-    Vue.directive('interact', {
-        bind(el, bindings) {
-            const interactable = interact(el);
-
-            el.dataset.interactable = interactables.push(interactable) - 1;
-
-            const bindingValueIndex = bindingValues.push(bindings.value) - 1;
-
-            el.dataset.bindingValue = bindingValueIndex;
-
-            switch (bindings.arg) {
-                case 'doubletap':
-                    interactable.on('doubletap', (e) => bindingValues[bindingValueIndex](e));
-                    break;
-                case 'tap':
-                default:
-                    interactable.on('tap', (e) => bindingValues[bindingValueIndex](e));
-            }
-        },
-        update(el, bindings) {
-            if (bindings.value === bindings.oldValue) {
-                return;
-            }
-
-            const bindingValueIndex = +el.dataset.bindingValue;
-
-            bindingValues[bindingValueIndex] = bindings.value;
-        },
-        unbind(el) {
-            if (interactables[+el.dataset.interactable]) {
-                interactables[+el.dataset.interactable].unset();
-                delete interactables[+el.dataset.interactable];
-            }
-
-            if (bindingValues[+el.dataset.bindingValue]) {
-                delete bindingValues[+el.dataset.bindingValue];
-            }
-        }
-    });
+    Vue.directive("interact", new InteractDirective().getDirectiveOptions());
 
     const lastLocale = localStorage.getItem("kaiplayerlocale");
     const locale = lastLocale || window.navigator.language || "en-US";
