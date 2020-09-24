@@ -115,7 +115,7 @@ export default class Player implements IPlayer {
     private soundsInRace: Howl[] = [];
     private soundsInRaceReject: Array<(reason: any) => void> = [];
     private raceTimeouts: Array<ReturnType<typeof setTimeout>> = [];
-    private lastError?: number|Error;
+    private lastError?: unknown;
     private lastErrorSoundId?: number;
     private lastErrorReject?: (reason: any) => void;
     private lastErrorSound?: Howl;
@@ -150,6 +150,9 @@ export default class Player implements IPlayer {
                 mute: true,
                 src: url,
                 volume: this.volume,
+
+                // @ts-ignore
+                crossOrigin: "anonymous",
             })), raceId);
         }, timeToWait));
     }
@@ -160,7 +163,7 @@ export default class Player implements IPlayer {
         }
 
         this.soundsInRace.forEach((sound, i) => {
-            sound.once("playerror", (soundId: number, err: number|Error) => {
+            sound.once("playerror", (soundId: number, err: unknown) => {
                 setTimeout(() => {
                     if (this.raceErrorCount >= this.soundsInRace.length && this.soundsInRaceReject[i]) {
                         this.soundsInRaceReject[i]([soundId, err, sound]);
@@ -168,7 +171,7 @@ export default class Player implements IPlayer {
                 }, 0);
             });
 
-            sound.once("loaderror", (soundId: number, err: number|Error) => {
+            sound.once("loaderror", (soundId: number, err: unknown) => {
                 setTimeout(() => {
                     if (this.raceErrorCount >= this.soundsInRace.length && this.soundsInRaceReject[i]) {
                         this.soundsInRaceReject[i]([soundId, err, sound]);
@@ -288,7 +291,7 @@ export default class Player implements IPlayer {
             this.sound.on(event, callback);
         }
 
-        const callbackWrap = (id: number, err: number|string|Error) => {
+        const callbackWrap = (id: number, err: unknown) => {
             if (typeof err === "number") {
                 callback(this.getLoadError(err));
             } else if (err instanceof Error) {
@@ -476,7 +479,7 @@ export default class Player implements IPlayer {
                                 resolve(sound);
                             });
 
-                            sound.once("playerror", (soundId: number, err: number|Error) => {
+                            sound.once("playerror", (soundId: number, err: unknown) => {
                                 this.raceErrorCount++;
                                 this.lastErrorReject = reject;
                                 this.lastError = err;
@@ -492,7 +495,7 @@ export default class Player implements IPlayer {
                         }
                     });
 
-                    sound.once("loaderror", (soundId: number, err: number|Error) => {
+                    sound.once("loaderror", (soundId: number, err: unknown) => {
                         this.raceErrorCount++;
                         this.lastErrorReject = reject;
                         this.lastError = err;

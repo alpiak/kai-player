@@ -766,7 +766,7 @@ export default class PlayerController implements IPlayerController {
             };
 
             const sameOrigin = ({ host, hostname }: { host?: string, hostname?: string }) => {
-                return host === location.host && hostname === location.hostname;
+                return (host && host === location.host) || (hostname && hostname === location.hostname);
             };
 
             if (/^\/proxy/.test(loadedUrl) || sameOrigin(parseUrl(loadedUrl)) || process.env.DEMO) {
