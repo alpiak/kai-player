@@ -75,7 +75,7 @@ module.exports = {
                 loader: 'pug-plain-loader'
             },
             {
-                test: /\.(?:mp3|svg|png|ico)$/,
+                test: /\.(?:ogg|mp3|svg|png|ico)$/,
                 loader: 'url-loader?limit=8192'
             },
             {

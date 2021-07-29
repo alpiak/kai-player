@@ -186,10 +186,7 @@ export default class PlayerController implements IPlayerController {
 
                 this.loading = true;
                 rejectPlayback(e);
-
-                if (this.resolveExistingPlayTrackPromise) {
-                    this.resolveExistingLoadingPromise();
-                }
+                this.resolveExistingLoadingPromise();
             }
         });
     }

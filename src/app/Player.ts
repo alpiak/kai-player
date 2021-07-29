@@ -10,6 +10,8 @@ import IPlayer from "./IPlayer";
 
 import PlayerStatus from "./PlayerStatus";
 
+import WakeLock from "./WakeLock";
+
 export default class Player implements IPlayer {
     private static cancelWatchRaceError = new Error("Cancelled watching race.");
     private static noRaceError = new Error("No race started.");
@@ -119,11 +121,13 @@ export default class Player implements IPlayer {
     private lastErrorSoundId?: number;
     private lastErrorReject?: (reason: any) => void;
     private lastErrorSound?: Howl;
+    private wakeLock: WakeLock;
 
     constructor() {
         this.volume = .5;
         this.seek = 0;
         this.callbackWrapMap.set(this.updateSeek, () => this.updateSeek());
+        this.wakeLock = new WakeLock();
     }
 
     public startRace(id?: number) {
@@ -226,10 +230,16 @@ export default class Player implements IPlayer {
         }
 
         if (this.altSound) {
-            this.altSound.unload();
+            try {
+                this.altSound.unload();
+            } catch (e) {
+                // console.log(e);
+            }
 
             delete this.altSound;
         }
+
+        this.wakeLock.destroy();
     }
 
     public play() {
@@ -245,6 +255,7 @@ export default class Player implements IPlayer {
 
         this.sound.seek(this.seek);
         this.sound.play();
+        this.wakeLock.enable();
     }
 
     public pause() {
@@ -271,13 +282,19 @@ export default class Player implements IPlayer {
 
         if (this.sound) {
             if (this.sound.state() === "loading") {
-                this.sound.unload();
+                try {
+                    this.sound.unload();
+                } catch (e) {
+                    // console.log(e);
+                }
             } else {
                 this.sound.stop();
             }
 
             this.seek = 0;
         }
+
+        this.wakeLock.disable();
     }
 
     public on(event: string, callback: (...args: any) => any) {
@@ -287,9 +304,9 @@ export default class Player implements IPlayer {
             }
         }
 
-        if (this.sound) {
-            this.sound.on(event, callback);
-        }
+        // if (this.sound) {
+        //     this.sound.on(event, callback);
+        // }
 
         const callbackWrap = (id: number, err: unknown) => {
             if (typeof err === "number") {
@@ -453,7 +470,7 @@ export default class Player implements IPlayer {
         }
     }
 
-    private joinSoundsToRace(sounds: Howl[]|Howl, raceId: number, { successEvent = "progress" } = {}) {
+    private joinSoundsToRace(sounds: Howl[] | Howl, raceId: number, { successEvent = "progress" } = {}) {
         if (!this.racing) {
             return;
         }
@@ -528,7 +545,11 @@ export default class Player implements IPlayer {
 
             if (!active) {
                 if (this.sound) {
-                    this.sound.unload();
+                    try {
+                        this.sound.unload();
+                    } catch (e) {
+                        // console.log(e);
+                    }
                 }
 
                 this.sound = sound;
@@ -541,7 +562,11 @@ export default class Player implements IPlayer {
                 sound.stop();
 
                 if (this.altSound) {
-                    this.altSound.unload();
+                    try {
+                        this.altSound.unload();
+                    } catch (e) {
+                        // console.log(e);
+                    }
                 }
 
                 this.altSound = sound;
@@ -577,7 +602,11 @@ export default class Player implements IPlayer {
                         return;
                     }
 
-                    soundInRace.unload();
+                    try {
+                        soundInRace.unload();
+                    } catch (e) {
+                        // console.log(e);
+                    }
 
                     delete this.soundsInRace[index];
                 });
@@ -597,7 +626,11 @@ export default class Player implements IPlayer {
             }
 
             if (this.sound) {
-                this.sound.unload();
+                try {
+                    this.sound.unload();
+                } catch (e) {
+                    // console.log(e);
+                }
             }
 
             this.sound = sound;
