@@ -22,7 +22,10 @@ export default class InteractDirective extends Directive implements IDirective {
             case "doubletap":
                 interactable.on("doubletap", (e) => {
                     this.bindingValues[bindingValueIndex](e);
-                    e.preventDefault();
+
+                    if (!binding.modifiers.allowDefault) {
+                        e.preventDefault();
+                    }
                 });
 
                 break;
@@ -31,7 +34,10 @@ export default class InteractDirective extends Directive implements IDirective {
             default:
                 interactable.on("tap", (e) => {
                     this.bindingValues[bindingValueIndex](e);
-                    e.preventDefault();
+
+                    if (!binding.modifiers.allowDefault) {
+                        e.preventDefault();
+                    }
                 });
         }
     }

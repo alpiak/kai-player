@@ -136,7 +136,7 @@
             template(v-for="(group, groupIndex) in contextMenuOptions")
                 li(
                     v-for="option in group"
-                    v-interact:tap="() => { option.callback(); }"
+                    v-interact:tap.allowDefault="() => { option.callback(); }"
                     :style="option.width && option.width[$i18n.locale] && { width: `${option.width[$i18n.locale]}px` }"
                 )
                     span(v-t="option.text")
